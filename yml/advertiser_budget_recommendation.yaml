@@ -1,0 +1,57 @@
+sources:
+  - name: advertiser_recommendation_sl_budget_trigger
+    storage_spec:
+      table_name: advertiser_recommendation_sl_budget_trigger
+      timestamp_column: active_date
+    compute_spec:
+      databricks_spec:
+        filepath: features/ads_landscape_forecast/budget_recommendation/advertiser_recommendation_sl_budget_trigger.py
+      trigger_spec:
+        schedule: "0 1 * * *"
+    metadata_spec:
+      user: ads-econ
+
+  - name: advertiser_recommendation_sl_budget_campaign_level_info
+    storage_spec:
+      table_name: advertiser_recommendation_sl_budget_campaign_level_info
+      timestamp_column: active_date
+    compute_spec:
+      databricks_spec:
+        filepath: features/ads_landscape_forecast/budget_recommendation/advertiser_recommendation_sl_budget_campaign_level_info.py
+      trigger_spec:
+        schedule: "0 1 * * *"
+    metadata_spec:
+      user: ads-econ
+
+  - name: advertiser_recommendation_sl_budget_business_id_info
+    storage_spec:
+      table_name: advertiser_recommendation_sl_budget_business_id_info
+      timestamp_column: active_date
+    compute_spec:
+      databricks_spec:
+        filepath: features/ads_landscape_forecast/budget_recommendation/advertiser_recommendation_sl_budget_business_id_info.py
+      trigger_spec:
+        upstreams:
+          - type: DATALAKE
+            partition: prod/ml/datasets
+            table_name: advertiser_recommendation_sl_budget_trigger
+          - type: DATALAKE
+            partition: prod/ml/datasets
+            table_name: advertiser_recommendation_sl_budget_campaign_level_info
+    metadata_spec:
+      user: ads-econ
+
+  - name: advertiser_recommendation_sl_budget_adjustments
+    storage_spec:
+      type: SNOWFLAKE
+      table_name: advertiser_recommendation_sl_budget
+    compute_spec:
+      databricks_spec:
+        filepath: features/ads_landscape_forecast/budget_recommendation/advertiser_recommendation_sl_budget_adjustments.py
+      trigger_spec:
+        upstreams:
+          - type: DATALAKE
+            partition: prod/ml/datasets
+            table_name: advertiser_recommendation_sl_budget_business_id_info
+    metadata_spec:
+      user: ads-econ

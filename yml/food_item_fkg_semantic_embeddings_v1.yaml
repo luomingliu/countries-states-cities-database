@@ -1,0 +1,29 @@
+sources:
+  - name: food_item_fkg_semantic_embeddings_v1
+    type: BATCH_DAILY
+    storage_spec:
+      type: DATALAKE
+      table_name: food_item_fkg_semantic_embeddings_v1
+      entity_type: NORMALIZED
+      timestamp_column: active_date
+    compute_spec:
+      databricks_spec:
+        filepath: features/food_knowledge_graph/embeddings/food_item_fkg_semantic_embeddings_v1.py
+      trigger_spec:
+        schedule: "0 1 * * *"
+    metadata_spec:
+      user: search-eq-eng
+
+feature_groups:
+  - source: food_item_fkg_semantic_embeddings_v1
+    metadata_spec:
+      user: search-eq-eng
+    materialize_spec:
+      sink:
+        - feature_store_prod_ug
+      override_safe_mode: true
+    features:
+      - name: iaf_it_fkg_du_restaurant_items_v3_agg_v1_emb
+        description: SBERT embeddings for all food items using FKG tags and item names
+      - name: wcf_it_food_item_semantic_v1_emb
+        description: SBERT embeddings for all food items using only item names
