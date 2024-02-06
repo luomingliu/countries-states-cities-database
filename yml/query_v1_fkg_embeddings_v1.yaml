@@ -1,0 +1,27 @@
+sources:
+  - name: query_v1_fkg_embeddings_v1
+    type: BATCH_DAILY
+    storage_spec:
+      type: DATALAKE
+      table_name: query_v1_fkg_embeddings_v1
+      entity_type: NORMALIZED
+      timestamp_column: active_date
+    compute_spec:
+      databricks_spec:
+        filepath: features/food_knowledge_graph/embeddings/query_v1_fkg_embeddings_v1.py
+        pypi_libraries:
+          - "sentence-transformers"
+      trigger_spec:
+        schedule: "0 5 * * *"
+    metadata_spec:
+      user: search-eq-eng
+
+features:
+  - name: iaf_qry_fkg_qu_52k_agg_v1_emb
+    source: query_v1_fkg_embeddings_v1
+    metadata_spec:
+      description: SBERT embeddings for 52k query using FKG QU result
+    materialize_spec:
+      sink:
+        - feature_store_prod_ug
+      override_safe_mode: true
